@@ -1,6 +1,5 @@
-import { Post } from "../../domains/posts";
-import { PostSummary } from "../molecules/PostSummary";
-
+import { Post } from "../../../../domains/posts";
+import { PostSummary } from "./PostSummary";
 
 export function PostList({
   posts,

@@ -3,7 +3,7 @@ import { Geist } from "next/font/google";
 import "./globals.css";
 import { Header } from "../presentation/organisms/Header";
 import { AppProviders } from "../store/providers";
-import { RestoreFeedScroll } from "../presentation/pages/feed/RestoreFeedScroll";
+import { RestoreFeedScroll } from "../presentation/pages/feed/components/RestoreFeedScroll";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

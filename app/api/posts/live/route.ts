@@ -1,5 +1,5 @@
 const encoder = new TextEncoder();
-const pushDelay = 1500;
+const pushDelay = 1000;
 
 export function GET() {
   let timer: ReturnType<typeof setTimeout> | undefined;

@@ -1,12 +1,11 @@
+import { store } from "@/store/store";
+import { jsonResponse } from "@/tests/jsonResponse";
 import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Provider } from "react-redux";
-import { Feed } from "./Feed";
-import { store } from "../../../store/store";
-import { clearPosts } from "../../../store/postsSlice";
-import { RestoreFeedScroll } from "./RestoreFeedScroll";
-import { jsonResponse } from "../../../tests/jsonResponse";
-
+import { FeedPage } from "../FeedPage";
+import { clearPosts } from "@/store/postsSlice";
+import { RestoreFeedScroll } from "../components/RestoreFeedScroll";
 
 let mockPathname = "/";
 
@@ -82,7 +81,7 @@ function mockFeed(pages: { skip: number; posts: ReturnType<typeof post>[]; total
 function openHome() {
   render(
     <Provider store={store}>
-      <Feed />
+      <FeedPage />
     </Provider>,
   );
 }
@@ -133,7 +132,7 @@ describe("Given they are partway down the feed", () => {
       const view = render(
         <Provider store={store}>
           <RestoreFeedScroll />
-          <Feed />
+          <FeedPage />
         </Provider>,
       );
       await user.click(await screen.findByRole("link", { name: "Story" }));
@@ -141,7 +140,7 @@ describe("Given they are partway down the feed", () => {
       view.rerender(
         <Provider store={store}>
           <RestoreFeedScroll />
-          <Feed />
+          <FeedPage />
         </Provider>,
       );
 
@@ -149,7 +148,7 @@ describe("Given they are partway down the feed", () => {
       view.rerender(
         <Provider store={store}>
           <RestoreFeedScroll />
-          <Feed />
+          <FeedPage />
         </Provider>,
       );
 

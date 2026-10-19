@@ -1,7 +1,6 @@
 import Link from "next/link";
-import { Post } from "../../domains/posts";
-import { Author } from "./Author";
-
+import { Post } from "../../../../domains/posts";
+import { Author } from "../../../molecules/Author";
 
 const previewLength = 100;
 

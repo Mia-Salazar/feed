@@ -5,10 +5,11 @@ import { useDispatch } from "react-redux";
 import { Post } from "../../../domains/posts";
 import { AppDispatch } from "../../../store/store";
 import { savePosts, saveScroll } from "../../../store/postsSlice";
-import { PageMain } from "../../atoms/PageMain";
-import { PostList } from "../../organisms/PostList";
+
 import { subscribeToNewPosts } from "../../../api/livePosts";
 import { loadPosts } from "../../../api/posts";
+import { PageContainer } from "../../atoms/PageContainer";
+import { PostList } from "./components/PostList";
 
 const highlightMs = 4000;
 
@@ -42,7 +43,7 @@ function toFeedList(page: FeedPage): FeedList {
   };
 }
 
-export function Feed({ initialPage }: { initialPage?: FeedPage }) {
+export function FeedPage({ initialPage }: { initialPage?: FeedPage }) {
   const dispatch = useDispatch<AppDispatch>();
   const [list, setList] = useState<FeedList | null>(initialPage ? toFeedList(initialPage) : null);
   const [error, setError] = useState<string | null>(null);
@@ -153,7 +154,7 @@ export function Feed({ initialPage }: { initialPage?: FeedPage }) {
   }, [dispatch, fetchedCount, total]);
 
   return (
-    <PageMain>
+    <PageContainer>
       <h1 className="text-3xl font-semibold tracking-tight">Feed</h1>
       {freshPost ? (
         <p className="sr-only" role="status">
@@ -187,6 +188,6 @@ export function Feed({ initialPage }: { initialPage?: FeedPage }) {
           ) : null}
         </div>
       ) : null}
-    </PageMain>
+    </PageContainer>
   );
 }
