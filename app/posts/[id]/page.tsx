@@ -1,5 +1,8 @@
 import { Suspense } from "react";
-import { LoadingPost, PostPage } from "../../../presentation/pages/post/PostPage";
+
+import { LoadingPost } from "@/presentation/pages/post/components/LoadingPost";
+
+import { PostPage } from "../../../presentation/pages/post/PostPage";
 import { loadCachedPost } from "../../cachedPosts";
 
 export default function Page({ params }: { params: Promise<{ id: string }> }) {
