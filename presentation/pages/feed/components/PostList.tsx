@@ -1,5 +1,6 @@
-import { Post } from "../../../../domains/posts";
 import { PostSummary } from "./PostSummary";
+
+import { Post } from "../../../../domains/posts";
 
 export function PostList({
   posts,

@@ -1,4 +1,5 @@
 import Link from "next/link";
+
 import { Post } from "../../../../domains/posts";
 import { Author } from "../../../molecules/Author";
 

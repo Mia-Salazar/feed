@@ -3,7 +3,8 @@
 import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { useSelector } from "react-redux";
-import { RootState } from "../../../store/store";
+
+import { RootState } from "@/store/store";
 
 export function RestoreFeedScroll() {
   const pathname = usePathname();
