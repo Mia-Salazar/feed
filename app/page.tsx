@@ -1,7 +1,7 @@
 import { Suspense } from "react";
-import { loadCachedPosts } from "@/app/cachedPosts";
-import { Feed } from "@/presentation/pages/feed/Feed";
-import { PageMain } from "@/presentation/atoms/PageMain";
+import { PageMain } from "../presentation/atoms/PageMain";
+import { Feed } from "../presentation/pages/feed/Feed";
+import { loadCachedPosts } from "./cachedPosts";
 
 export default function HomePage() {
   return (
@@ -27,3 +27,4 @@ async function CachedFeed() {
 
   return <Feed initialPage={page ?? undefined} />;
 }
+
