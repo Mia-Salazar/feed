@@ -2,14 +2,16 @@
 
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
+
+import { PostList } from "./components/PostList";
+
 import { Post } from "../../../domains/posts";
 import { AppDispatch } from "../../../store/store";
 import { savePosts, saveScroll } from "../../../store/postsSlice";
-
 import { subscribeToNewPosts } from "../../../api/livePosts";
 import { loadPosts } from "../../../api/posts";
 import { PageContainer } from "../../atoms/PageContainer";
-import { PostList } from "./components/PostList";
+
 
 const highlightMs = 4000;
 

@@ -135,7 +135,12 @@ describe("Given they are partway down the feed", () => {
           <FeedPage />
         </Provider>,
       );
-      await user.click(await screen.findByRole("link", { name: "Story" }));
+      const story = await screen.findByRole("link", { name: "Story" });
+      // jsdom follows real link clicks. This test changes the route itself.
+      story.addEventListener("click", (event) => {
+        event.preventDefault();
+      });
+      await user.click(story);
       mockPathname = "/posts/7";
       view.rerender(
         <Provider store={store}>
