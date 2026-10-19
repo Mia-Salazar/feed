@@ -1,5 +1,6 @@
-import type { Post } from "@/domain/post";
-import { PostSummary } from "@/presentation/molecules/PostSummary";
+import { Post } from "../../domains/posts";
+import { PostSummary } from "../molecules/PostSummary";
+
 
 export function PostList({
   posts,
