@@ -175,7 +175,10 @@ describe("Given they are partway down the feed", () => {
       jest.spyOn(window, "scrollTo").mockImplementation(() => undefined);
       mockFeed([{ skip: 0, posts: [post(7, "Story")], total: 1 }]);
       const view = render(feedWithScroll());
-      await user.click(await screen.findByRole("link", { name: "Story" }));
+      const story = await screen.findByRole("link", { name: "Story" });
+      // No app router in this test, so the link would otherwise leave the page.
+      story.addEventListener("click", (event) => event.preventDefault());
+      await user.click(story);
       mockPathname = "/posts/7";
       view.rerender(feedWithScroll());
 
