@@ -1,11 +1,13 @@
+import { Provider } from "react-redux";
+
 import { store } from "@/store/store";
 import { jsonResponse } from "@/tests/jsonResponse";
 import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { Provider } from "react-redux";
-import { FeedPage } from "../FeedPage";
 import { clearPosts } from "@/store/postsSlice";
+
 import { RestoreFeedScroll } from "../components/RestoreFeedScroll";
+import { FeedPage } from "../FeedPage";
 
 let mockPathname = "/";
 
@@ -86,6 +88,15 @@ function openHome() {
   );
 }
 
+function feedWithScroll() {
+  return (
+    <Provider store={store}>
+      <RestoreFeedScroll />
+      <FeedPage />
+    </Provider>
+  );
+}
+
 beforeEach(() => {
   store.dispatch(clearPosts());
   mockPathname = "/";
@@ -116,6 +127,40 @@ describe("Given DummyJSON returns one publication", () => {
       expect(screen.getByText("Text of the post")).toBeVisible();
     });
   });
+
+  describe("When a new post is pushed", () => {
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
+    it("Then they see it first, marked as new", async () => {
+      openHome();
+      await screen.findByRole("link", { name: "Story" });
+
+      await act(async () => {
+        mockDeliverPost(freshPost);
+      });
+
+      expect(screen.getAllByRole("heading", { level: 2 })[0]).toHaveAccessibleName("Fresh story");
+      expect(screen.getByText("New")).toBeVisible();
+    });
+
+    it("And the new mark goes away after a few seconds", async () => {
+      jest.useFakeTimers();
+      openHome();
+      await screen.findByRole("link", { name: "Story" });
+      await act(async () => {
+        mockDeliverPost(freshPost);
+      });
+
+      await act(async () => {
+        jest.advanceTimersByTime(4000);
+      });
+
+      expect(screen.getByRole("heading", { name: "Fresh story" })).toBeVisible();
+      expect(screen.queryByText("New")).not.toBeInTheDocument();
+    });
+  });
 });
 
 describe("Given they are partway down the feed", () => {
@@ -129,33 +174,13 @@ describe("Given they are partway down the feed", () => {
       setPageScroll(480);
       jest.spyOn(window, "scrollTo").mockImplementation(() => undefined);
       mockFeed([{ skip: 0, posts: [post(7, "Story")], total: 1 }]);
-      const view = render(
-        <Provider store={store}>
-          <RestoreFeedScroll />
-          <FeedPage />
-        </Provider>,
-      );
-      const story = await screen.findByRole("link", { name: "Story" });
-      // jsdom follows real link clicks. This test changes the route itself.
-      story.addEventListener("click", (event) => {
-        event.preventDefault();
-      });
-      await user.click(story);
+      const view = render(feedWithScroll());
+      await user.click(await screen.findByRole("link", { name: "Story" }));
       mockPathname = "/posts/7";
-      view.rerender(
-        <Provider store={store}>
-          <RestoreFeedScroll />
-          <FeedPage />
-        </Provider>,
-      );
+      view.rerender(feedWithScroll());
 
       mockPathname = "/";
-      view.rerender(
-        <Provider store={store}>
-          <RestoreFeedScroll />
-          <FeedPage />
-        </Provider>,
-      );
+      view.rerender(feedWithScroll());
 
       expect(window.scrollTo).toHaveBeenCalledWith(0, 480);
     });
@@ -204,46 +229,6 @@ describe("Given a post body is longer than the preview", () => {
 
       expect(await screen.findByText(`${shown}…`)).toBeVisible();
       expect(screen.queryByText(/keeps going on the post page/)).not.toBeInTheDocument();
-    });
-  });
-});
-
-describe("Given they are reading the feed", () => {
-  beforeEach(() => {
-    mockFeed([{ skip: 0, posts: [post(7, "Story")], total: 1 }]);
-  });
-
-  afterEach(() => {
-    jest.useRealTimers();
-  });
-
-  describe("When a new post is pushed", () => {
-    it("Then they see it first, marked as new", async () => {
-      openHome();
-      await screen.findByRole("link", { name: "Story" });
-
-      await act(async () => {
-        mockDeliverPost(freshPost);
-      });
-
-      expect(screen.getAllByRole("heading", { level: 2 })[0]).toHaveAccessibleName("Fresh story");
-      expect(screen.getByText("New")).toBeVisible();
-    });
-
-    it("And the new mark goes away after a few seconds", async () => {
-      jest.useFakeTimers();
-      openHome();
-      await screen.findByRole("link", { name: "Story" });
-      await act(async () => {
-        mockDeliverPost(freshPost);
-      });
-
-      await act(async () => {
-        jest.advanceTimersByTime(4000);
-      });
-
-      expect(screen.getByRole("heading", { name: "Fresh story" })).toBeVisible();
-      expect(screen.queryByText("New")).not.toBeInTheDocument();
     });
   });
 });

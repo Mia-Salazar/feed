@@ -12,7 +12,6 @@ import { subscribeToNewPosts } from "../../../api/livePosts";
 import { loadPosts } from "../../../api/posts";
 import { PageContainer } from "../../atoms/PageContainer";
 
-
 const highlightMs = 4000;
 
 type FeedPage = {
@@ -83,23 +82,27 @@ export function FeedPage({ initialPage }: { initialPage?: FeedPage }) {
       unsubscribe = subscribeToNewPosts(rememberLivePost);
     }
 
+    async function loadFirstPage() {
+      try {
+        const page = await loadPosts(0);
+
+        if (!active) {
+          return;
+        }
+
+        setList(toFeedList(page));
+        connect(page.posts);
+      } catch (caught: unknown) {
+        if (active) {
+          setError(errorMessage(caught));
+        }
+      }
+    }
+
     if (initialPage) {
       connect(initialPage.posts);
     } else {
-      void loadPosts(0)
-        .then((page) => {
-          if (!active) {
-            return;
-          }
-
-          setList(toFeedList(page));
-          connect(page.posts);
-        })
-        .catch((caught: unknown) => {
-          if (active) {
-            setError(errorMessage(caught));
-          }
-        });
+      void loadFirstPage();
     }
 
     return () => {
@@ -117,7 +120,7 @@ export function FeedPage({ initialPage }: { initialPage?: FeedPage }) {
     const skip = fetchedCount;
     let loadingPage = false;
 
-    function loadNextPage() {
+    async function loadNextPage() {
       if (!reachedTheBottom() || loadingPage) {
         return;
       }
@@ -125,29 +128,27 @@ export function FeedPage({ initialPage }: { initialPage?: FeedPage }) {
       loadingPage = true;
       setLoadingMore(true);
 
-      void loadPosts(skip)
-        .then((page) => {
-          dispatch(savePosts(page.posts));
-          setList((current) =>
-            current
-              ? {
-                  posts: [...current.posts, ...page.posts],
-                  total: page.total,
-                  fetchedCount: skip + page.posts.length,
-                }
-              : current,
-          );
-        })
-        .catch((caught: unknown) => {
-          setError(errorMessage(caught));
-        })
-        .finally(() => {
-          loadingPage = false;
-          setLoadingMore(false);
-        });
+      try {
+        const page = await loadPosts(skip);
+        dispatch(savePosts(page.posts));
+        setList((current) =>
+          current
+            ? {
+                posts: [...current.posts, ...page.posts],
+                total: page.total,
+                fetchedCount: skip + page.posts.length,
+              }
+            : current,
+        );
+      } catch (caught: unknown) {
+        setError(errorMessage(caught));
+      } finally {
+        loadingPage = false;
+        setLoadingMore(false);
+      }
     }
 
-    loadNextPage();
+    void loadNextPage();
     window.addEventListener("scroll", loadNextPage, { passive: true });
 
     return () => {
@@ -168,15 +169,13 @@ export function FeedPage({ initialPage }: { initialPage?: FeedPage }) {
           {error}
         </p>
       ) : null}
-      {list === null && error === null ? (
+      {!list && !error ? (
         <p className="mt-4 text-muted" role="status">
           Loading posts…
         </p>
       ) : null}
-      {list !== null && list.posts.length === 0 ? (
-        <p className="mt-4 text-muted">There are no posts.</p>
-      ) : null}
-      {list !== null && list.posts.length > 0 ? (
+      {list?.posts.length === 0 ? <p className="mt-4 text-muted">There are no posts.</p> : null}
+      {list && list.posts.length > 0 ? (
         <div className="mt-8">
           <PostList
             highlightedId={freshPost?.id}
