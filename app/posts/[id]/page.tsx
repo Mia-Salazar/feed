@@ -1,11 +1,10 @@
 import { Suspense } from "react";
-
+import { loadPost } from "@/api/posts";
 import { LoadingPost } from "@/presentation/pages/post/components/LoadingPost";
+import { PostPage } from "@/presentation/pages/post/PostPage";
 
-import { PostPage } from "../../../presentation/pages/post/PostPage";
-import { loadCachedPost } from "../../cachedPosts";
 
-export default function Page({ params }: { params: Promise<{ id: string }> }) {
+export default function DetailPage({ params }: { params: Promise<{ id: string }> }) {
   return (
     <Suspense fallback={<LoadingPost />}>
       <PostRoute params={params} />
@@ -17,7 +16,9 @@ async function PostRoute({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const numericId = Number(id);
   const initialPost =
-    Number.isInteger(numericId) && numericId > 0 ? await loadCachedPost(numericId) : null;
+    Number.isInteger(numericId) && numericId > 0 ? await loadPost(numericId) : null;
 
-  return <PostPage id={id} initialPost={initialPost} />;
+  return <PostPage key={id} id={id} initialPost={initialPost} />;
 }
+
+

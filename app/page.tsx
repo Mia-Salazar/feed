@@ -1,13 +1,13 @@
 import { Suspense } from "react";
 
-import { loadCachedPosts } from "./cachedPosts";
-import { PageContainer } from "../presentation/atoms/PageContainer";
-import { FeedPage } from "../presentation/pages/feed/FeedPage";
+import { loadPosts } from "@/api/posts";
+import { PageContainer } from "@/presentation/atoms/PageContainer";
+import { FeedPage } from "@/presentation/pages/feed/FeedPage";
 
 export default function HomePage() {
   return (
     <Suspense fallback={<LoadingFeed />}>
-      <CachedFeed />
+      <HomeFeed />
     </Suspense>
   );
 }
@@ -23,8 +23,8 @@ function LoadingFeed() {
   );
 }
 
-async function CachedFeed() {
-  const page = await loadCachedPosts(0).catch(() => null);
+async function HomeFeed() {
+  const page = await loadPosts(0).catch(() => null);
 
   return <FeedPage initialPage={page ?? undefined} />;
 }
